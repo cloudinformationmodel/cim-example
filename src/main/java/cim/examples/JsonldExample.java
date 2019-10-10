@@ -24,21 +24,25 @@ public class JsonldExample {
     public static void run(Path cimPath) throws IOException {
 
         // Select the level of semantics we want to load from the model distribution
-        CIMLoader loader = new CIMLoader(cimPath, CIMUseCase.CONCEPTUAL);
+        CIMLoader loader = new CIMLoader(cimPath, CIMUseCase.CONCEPTUAL_AND_SCHEMA);
 
         // Load all of CIM into a single graph
         Object singleJsonLDGraph = loader.getJsonLDGraph();
 
+        // Some problem with the framing API
+        /*
         // Define a JSON-LD frame to extract all the properties
         Object frame = new HashMap<String, Object>() {{
             put("@context", loader.loadJsonldContext());
             put("@type", "rdf:Property");
         }};
 
+
         // Extract all the properties
-        Object framed = JsonLdProcessor.frame(singleJsonLDGraph, frame, new JsonLdOptions());
+        //Object framed = JsonLdProcessor.frame(singleJsonLDGraph, frame, new JsonLdOptions());
+         */
 
         // Print the output JSON-LD document
-        System.out.println(JsonUtils.toPrettyString(framed));
+        System.out.println(JsonUtils.toPrettyString(singleJsonLDGraph));
     }
 }
