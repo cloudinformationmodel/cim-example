@@ -77,11 +77,11 @@ public class CIMLoader {
      */
     protected static boolean mustLoad(Path file, CIMUseCase useCase) {
         if (useCase == CIMUseCase.CANONICAL_SCHEMA) {
-            return file.endsWith("schema.jsonld");
+            return file.endsWith("schema.jsonld") || file.endsWith("about.jsonld");
         } else if (useCase == CIMUseCase.CONCEPTUAL) {
-            return file.endsWith("concepts.jsonld");
+            return file.endsWith("concepts.jsonld") || file.endsWith("about.jsonld");
         } else {
-            return file.endsWith("schema.jsonld") || file.endsWith("concepts.jsonld");
+            return file.endsWith("schema.jsonld") || file.endsWith("concepts.jsonld")  || file.endsWith("about.jsonld");
         }
     }
 

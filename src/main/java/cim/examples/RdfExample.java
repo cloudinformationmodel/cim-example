@@ -1,11 +1,10 @@
 package cim.examples;
 
+import cim.examples.rdf.Queries;
 import cim.loader.CIMLoader;
 import cim.loader.CIMUseCase;
 import org.apache.jena.query.*;
-import org.apache.jena.rdf.model.Model;
-import org.apache.jena.rdf.model.ResIterator;
-import org.apache.jena.rdf.model.Resource;
+import org.apache.jena.rdf.model.*;
 
 import java.io.IOException;
 import java.nio.file.Path;
@@ -29,11 +28,30 @@ public class RdfExample {
         // count assertions
         System.out.println("Total number of statements in the graph: " + model.size());
 
+        //
+        // SPARQL API
+        //
+
+        // We can use SPARQL to query the model metadata graph
+        // The Queries object stores all the different queries
+        Queries queries = new Queries(model);
+        // Types of elements
+        elementTypesQuery(queries);
+
+        // Count elements
+        countsQuery(queries);
+
+        // List all classes
+        descriptionQuery(queries);
+
+
+        //
+        // Jena API
+        //
+
         // We can use the Jena API to extract information from the graph
         jenaAPI(model);
 
-        // We can use SPARQL to query the model metadata graph
-        SparqlAPI(model);
     }
 
     protected static void jenaAPI(Model model) {
@@ -45,37 +63,39 @@ public class RdfExample {
         while(it.hasNext()) {
             Resource property = it.nextResource();
             System.out.println("\n\n** Property: " + property.getURI());
-            ResIterator entityGroupsIt = model.listSubjectsWithProperty(
-                    model.createProperty(model.expandPrefix("cim:properties")),
-                    property
+            NodeIterator domainsIt = model.listObjectsOfProperty(
+                    property,
+                    model.createProperty(model.expandPrefix("rdfs:domain"))
             );
-            System.out.println("  Used in entity groups:");
-            while(entityGroupsIt.hasNext()) {
-                Resource entityGroup = entityGroupsIt.nextResource();
-                System.out.println("    - " + entityGroup.getURI());
+            System.out.println("  Property domain:");
+            while(domainsIt.hasNext()) {
+                RDFNode entityGroup = domainsIt.nextNode();
+                System.out.println("    - " + entityGroup.asResource().getURI());
             }
         }
     }
 
-    protected static void SparqlAPI(Model model) {
-        String queryString =
-                "PREFIX cim: <http://cim.org/model/> " +
-                "PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> " +
-                "PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#> " +
-                "SELECT DISTINCT ?property ?entityGroup { " +
-                "    ?entityGroup cim:properties ?property ." +
-                "} ORDER BY ?property";
 
-        Query query = QueryFactory.create(queryString) ;
+    protected static void elementTypesQuery(Queries queries) {
+        System.out.println("Types of elements:");
+        System.out.println(queries.listModelElementTypes());
+    }
 
-        try (QueryExecution qexec = QueryExecutionFactory.create(query, model)) {
-            ResultSet results = qexec.execSelect() ;
-            while (results.hasNext()) {
-                QuerySolution soln = results.nextSolution();
-                Resource p = soln.getResource("property");
-                Resource eg = soln.getResource("entityGroup");
-                System.out.println(p.getURI().replace("http://cim.org/model/", "cim:") + " used in "+model.qnameFor(eg.getURI()));
-            }
-        }
+    protected static void descriptionQuery(Queries queries) {
+        System.out.println(queries.listClasses());
+    }
+
+    protected static void countsQuery(Queries queries) {
+        int subjectAreaCount = queries.countsQuery("cim:SubjectArea");
+        int entityGroupCount = queries.countsQuery("cim:EntityGroup");
+        int classCount = queries.countsQuery("rdfs:Class");
+        int propertyCount = queries.countsQuery("rdf:Property");
+        System.out.println(
+                "Model size:\n" +
+                        "  Subject Areas " + subjectAreaCount + "\n" +
+                        "  Entity Groups " + entityGroupCount + "\n" +
+                        "  Classes " + classCount + "\n" +
+                        "  Properties " + propertyCount + "\n"
+        );
     }
 }
