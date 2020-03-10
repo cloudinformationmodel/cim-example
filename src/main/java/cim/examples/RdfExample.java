@@ -3,7 +3,6 @@ package cim.examples;
 import cim.examples.rdf.Queries;
 import cim.loader.CIMLoader;
 import cim.loader.CIMUseCase;
-import org.apache.jena.query.*;
 import org.apache.jena.rdf.model.*;
 
 import java.io.IOException;
@@ -44,6 +43,8 @@ public class RdfExample {
         // List all classes
         descriptionQuery(queries);
 
+        // Cardinalities query
+        reconstructQuery(queries);
 
         //
         // Jena API
@@ -97,5 +98,10 @@ public class RdfExample {
                         "  Classes " + classCount + "\n" +
                         "  Properties " + propertyCount + "\n"
         );
+    }
+
+    protected static void reconstructQuery(Queries queries) {
+        System.out.println("Reconstructed: \n\n");
+        System.out.println(queries.reconstructTable());
     }
 }
