@@ -34,6 +34,7 @@ public class RdfExample {
         // We can use SPARQL to query the model metadata graph
         // The Queries object stores all the different queries
         Queries queries = new Queries(model);
+
         // Types of elements
         elementTypesQuery(queries);
 
@@ -45,6 +46,7 @@ public class RdfExample {
 
         // Cardinalities query
         reconstructQuery(queries);
+
 
         //
         // Jena API

@@ -81,7 +81,7 @@ public class CIMLoader {
         } else if (useCase == CIMUseCase.CONCEPTUAL) {
             return file.endsWith("concepts.jsonld") || file.endsWith("about.jsonld");
         } else {
-            return file.endsWith("schema.jsonld") || file.endsWith("concepts.jsonld")  || file.endsWith("about.jsonld");
+            return file.endsWith("schema.jsonld") || file.endsWith("concepts.jsonld")  || file.endsWith("about.jsonld") || file.endsWith("model.jsonld");
         }
     }
 
@@ -96,8 +96,11 @@ public class CIMLoader {
             return JsonUtils.fromInputStream(new FileInputStream(contextPath.toFile()));
         } catch (FileNotFoundException e) {
             Path contextPath = cimDirectory.resolve("./context.jsonld");
-            return JsonUtils.fromInputStream(new FileInputStream(contextPath.toFile()));
+            if (contextPath.toFile().exists()) {
+                return JsonUtils.fromInputStream(new FileInputStream(contextPath.toFile()));
+            }
         }
+        return null;
     }
 
     /**
@@ -110,7 +113,9 @@ public class CIMLoader {
     private static Object file2JSON(Path f, Object context) {
         try {
             LinkedHashMap<String, Object> json = (LinkedHashMap<String, Object>) JsonUtils.fromInputStream(new FileInputStream(f.toFile()));
-            json.put("@context", context); // update the context
+            if (context != null) {
+                json.put("@context", context); // update the context
+            }
             return json;
         } catch (IOException e) {
             return new HashMap<String,Object>();

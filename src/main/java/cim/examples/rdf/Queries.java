@@ -16,7 +16,7 @@ import java.util.Set;
 public class Queries {
 
     // Common URI prefixes for SPARQL queries
-    private static final String  PREFIXES =
+    protected static final String  PREFIXES =
             "PREFIX cim: <http://cloudinformationmodel.org/model/> " +
             "PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> " +
             "PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>" +
@@ -24,7 +24,7 @@ public class Queries {
             "PREFIX sh: <http://www.w3.org/ns/shacl#>\n";
 
     // RDF model being queried
-    private final Model model;
+    protected final Model model;
 
     public Queries(Model model) {
         this.model = model;
